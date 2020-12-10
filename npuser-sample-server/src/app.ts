@@ -8,6 +8,15 @@ const { sendResponse } = require('./response-handlers')
 
 const { MY_APP_TOKEN_SECRET } = process.env // the api key this app uses to connect with the npuser.org service
 
+if (!MY_APP_TOKEN_SECRET) {
+  throw new Error('Fatal setup error. Need MY_APP_TOKEN_SECRET to be defined in the environment')
+} else {
+  if (process.env.NODE_ENV === 'development') { console.log('MY_APP_TOKEN_SECRET', MY_APP_TOKEN_SECRET) }
+}
+
+console.log('NODE_ENV', process.env.NODE_ENV)
+console.log('MY_APP_TOKEN_SECRET', MY_APP_TOKEN_SECRET)
+
 // Once a user is validated the have access, when using the same browser, for ___ days
 const EXPIRES = 60 * 60 * 24 // * 1 day
 

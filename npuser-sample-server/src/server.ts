@@ -7,6 +7,11 @@ import compression from 'compression'
 import { SampleNpUserAuthorizer } from './np'
 import { SampleApp } from './app'
 
+if (!process.env.NODE_ENV) {
+  console.log(process.env)
+  throw new Error('Fatal setup error. Need process.env.NODE_ENV needs to be defined')
+}
+
 const serverPort = process.env.PORT || 3000
 
 export interface ApiProvider {

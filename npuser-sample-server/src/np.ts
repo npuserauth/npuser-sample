@@ -11,6 +11,11 @@ const { sendResponse } = require('./response-handlers')
 const { NPUSER_CLIENT_ID } = process.env // the api key this app uses to connect with the npuser.org service
 const { NPUSER_CLIENT_SECRET } = process.env // the shared secret this app uses to send encrypted data to npuser
 const { NPUSER_URL } = process.env // the npuser service url with? or without? trailing slash
+
+if (!NPUSER_CLIENT_ID || !NPUSER_CLIENT_SECRET || !NPUSER_URL) {
+  throw new Error('Fatal setup error. Need NPUSER_CLIENT_ID, NPUSER_CLIENT_SECRET and NPUSER_URL to be defined in the environment')
+}
+
 const verbose = true
 
 const SAMPLE_SERVER_PATH = '/user'
