@@ -1,0 +1,48 @@
+@import '../definitions';
+
+
+
+.button-group {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+button,
+.button,
+.button.is-primary {
+  background-color: $brand-primary;
+  font-family: inherit;
+  font-size: $bodyFontSize;
+  margin: 5px;
+  flex: 0 0 10%;
+  padding: 0.5rem 1rem;
+  border: transparent;
+  text-decoration: none;
+  border-radius: 5px;
+  cursor: pointer;
+  &:hover {
+    background-color: $brand-primary-hover;
+    transition-duration: 0.3s;
+    transition-property: background-color;
+  }
+  &:disabled {
+    background-color: $grey40;
+    color: $white;
+    cursor: default;
+  }
+}
+
+button + button {
+  margin-left: $buttonRowLeftMargin;
+}
+
+/* Small screens */
+@media all and (max-width: 500px) {
+  button + button {
+    margin-left: 0;
+  }
+  button {
+    margin-bottom: $buttonRowLeftMargin;
+  }
+}

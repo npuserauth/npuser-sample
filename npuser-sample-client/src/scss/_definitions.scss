@@ -1,0 +1,47 @@
+/* ****************** COLOUR ****************** */
+
+$brand-primary: #3396FF;
+$brand-primary-hover: darken( $brand-primary, 10% );
+$brand-primary-dark: #051F54;
+$brand-primary-light: #e8f2fd;
+
+$white: #FFF;
+$grey03: #F7F9FA;
+$grey10: #E8EBED;
+$greyWarn: #EFEBED;
+$grey20: #CBCED1;
+$grey40: #858B94;
+$grey60: #4F545C;
+$grey70: #383C45;
+$grey80: #22262E;
+$black: #151A24;
+
+$red: #D80000;
+$green-light: #7ED321;
+$green: #8dd03e;
+$blue: #3396FF;
+
+$text-color: #2c3e50;
+$active-link-color: $brand-primary;
+/* ****************** FORM ****************** */
+$required-border: #D80000;
+$invalid-border: #c00000;
+$invalid-background: #ffdddd;
+$valid-background: #ddffdd;
+
+/* ****************** TYPOGRAPHY ****************** */
+$bodyFontFamily: 'Source Sans Pro', sans-serif;
+$bodyFontSize: 16px;
+
+/* ****************** NAVIGATION ****************** */
+
+/* ****************** MESSAGING ****************** */
+$info: $blue;
+$success: $green;
+$error: $red;
+
+/* ****************** DIMENSIONS ****************** */
+$buttonRowLeftMargin: 15px;
+$formElementLeftMargin: 1rem;
+$border-width: 5px;
+

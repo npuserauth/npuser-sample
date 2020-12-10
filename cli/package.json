@@ -1,0 +1,21 @@
+{
+  "name": "sample-client.cli",
+  "version": "1.0.0",
+  "description": "Subproject of the sample npuser project. This project provides a CLI node script that demonstrates how to use npuser",
+  "scripts": {
+    "build": "webpack --mode=development",
+    "build:run": "npm run build && npm run run",
+    "sample": "cp .dev.env .env && node dist/main.js",
+    "prod": "cp .prod.env .env && npm run build && node dist/main.js"
+  },
+  "dependencies": {
+    "dotenv": "^8.2.0",
+    "npuser-client": "^1.0.16",
+    "readline": "^1.3.0"
+  },
+  "devDependencies": {
+    "nodemon-webpack-plugin": "^4.3.2",
+    "webpack": "^4.44.2",
+    "webpack-cli": "^3.3.12"
+  }
+}
