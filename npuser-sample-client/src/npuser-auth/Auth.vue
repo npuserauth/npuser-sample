@@ -86,6 +86,7 @@ export default {
 
     const authUser = async (email: string) => {
       State.setLoading(true)
+      state.errMsg = ''
       try {
         state.email = email
         const payload = {
@@ -108,6 +109,7 @@ export default {
 
     const verifyUser = async (vcode: string) => {
       State.setLoading(true)
+      state.errMsg = ''
       try {
         if (vcode) {
           const payload = {

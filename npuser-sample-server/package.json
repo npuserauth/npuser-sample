@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "ts-node  -r dotenv/config src/server.ts",
     "local:init": "cp sample.dev src/.env",
-    "local": "nodemon -r dotenv/config srv.js dotenv_config_path=src/.env",
+    "local": "NODE_ENV=development nodemon",
     "env:list": "grep 'process.env' -Rn *.js"
   },
   "author": "",
