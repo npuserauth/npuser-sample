@@ -1,10 +1,10 @@
 import express, { Router, Request, Response, NextFunction } from 'express'
+import asyncHandler from 'express-async-handler'
+import { NoPasswordAuthorizer, AuthResponse, ValidateResponse } from 'npuser-client'
 // to install local dev client
 // npm install /r/dev/npuserauth/npuser-client/
-import { NoPasswordAuthorizer, AuthResponse, ValidateResponse } from 'npuser-client'
 import { ApiProvider } from './server'
-import { sampleApplicationUserHandler } from './app'
-import asyncHandler from 'express-async-handler'
+import { applicationUserLoginHandler } from './app'
 const { BadRequest, InvalidRequest } = require('./errors/application-error')
 const { sendResponse } = require('./response-handlers')
 
@@ -30,7 +30,7 @@ const npuserAuthorizer = new NoPasswordAuthorizer({
 })
 
 export class SampleNpUserAuthorizer implements ApiProvider {
-  async userAuth (req: Request, res: Response, next: NextFunction) {
+  async npUserAuth (req: Request, res: Response, next: NextFunction) {
     const email = req.body.email
     if (verbose) console.log('npuser-sample-server: step 1 request with email:', email)
     const authResponse: AuthResponse = await npuserAuthorizer.sendAuth(email)
@@ -39,7 +39,7 @@ export class SampleNpUserAuthorizer implements ApiProvider {
     sendResponse(res, { token: token })
   }
 
-  async userValidate (req: Request, res: Response, next: NextFunction) {
+  async npUserValidate (req: Request, res: Response, next: NextFunction) {
     const { email, authToken, code } = req.body
     if (!email || !authToken || !code) {
       return next(new BadRequest('Must provide email address, verification code and the authorization token'))
@@ -69,10 +69,10 @@ export class SampleNpUserAuthorizer implements ApiProvider {
   route () {
     const router = Router()
     // STEP 1 -- post to /user/auth with email address will return the authorization token.
-    router.post(SAMPLE_SERVER_AUTH_PATH, asyncHandler(this.userAuth))
+    router.post(SAMPLE_SERVER_AUTH_PATH, asyncHandler(this.npUserAuth))
 
     // STEP 2 - post to /user/validate. Send email address, authorization token and validation code and finalize the user authorization
-    router.post(SAMPLE_SERVER_VALIDATE_PATH, [asyncHandler(this.userValidate), asyncHandler(sampleApplicationUserHandler)])
+    router.post(SAMPLE_SERVER_VALIDATE_PATH, [asyncHandler(this.npUserValidate), applicationUserLoginHandler])
     return router
   }
 

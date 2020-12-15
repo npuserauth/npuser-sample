@@ -1,41 +1,25 @@
-import axios from 'axios'
-import { AxiosRequestConfig, AxiosResponse, AxiosError} from "axios"
-import qs from 'qs'
+import {npAxios} from '@/np-axios'
 
-export default class ApiHelper {
-  private readonly apiUrl: String
-  constructor (apiUrl: String) {
-    this.apiUrl = apiUrl
-  }
+const URL = 'http://localhost:3000/'
 
-  submitEmail (email: String): Promise<string> {
-    const apiUrl = this.apiUrl
-    const url = `${apiUrl}/sendAuth`
-    const options: AxiosRequestConfig = {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/x-www-form-urlencoded',
-      },
-      data: qs.stringify({email}),
-      url,
-    }
-    type Auth = {
-      token: string;
-    }
-    return axios(options).then((response: AxiosResponse<Auth>) => {
-      const { data } = response;
-      console.log('What is in the response', response, data)
-      return data.token
+export const postToMyServer = async function (apiUrl: string, payload: object) {
+  const url = URL + apiUrl
+  console.log(`Auth post to ${url}`)
+  return npAxios
+    .post(url, payload)
+    .then(response => { return response.data })
+    .catch(error => {
+      throw error
     })
-  }
+}
 
-  demoLogout (token: String) {
-    const apiUrl = this.apiUrl
-    const url = `${apiUrl}/demo/logout`
-    return axios.post(url)
-    .catch((err: AxiosError) => {
-      console.log('demoHelper error', err)
+export const getFromMyServer = async function (apiUrl: string) {
+  const url = URL + apiUrl
+  console.log(`App get to ${url}`)
+  return npAxios
+    .get(url)
+    .then(response => { return response.data })
+    .catch(error => {
+      throw error
     })
-  }
-
 }

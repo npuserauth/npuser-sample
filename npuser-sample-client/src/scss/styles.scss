@@ -59,39 +59,7 @@ body {
   flex-direction: column;
 }
 
-#app-banner {
-  background-color: aliceblue;
-  margin: 0;
-  padding: 0;
-}
-
-#nav {
-  width: 90%;
-  margin: 0 auto;
-  padding: 1rem;
-  display: flex;
-  flex-direction: row;
-  font-size: 1.5rem;
-
-  a {
-    font-weight: bold;
-    color: $text-color;
-    text-decoration: none;
-    &.router-link-exact-active {
-      color: $active-link-color;
-    }
-  }
-  .nav-spacer {
-    width: 2rem;
-    text-align: center;
-    &::after {
-      content: '|';
-    }
-  }
-}
-@media all and (max-width: 500px) {
-#nav {
-  font-weight: normal;
-  font-size: 1rem;
-}
+.fa {
+  height: 2rem;
+  color: #209cee;
 }

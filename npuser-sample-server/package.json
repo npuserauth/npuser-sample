@@ -8,6 +8,7 @@
     "start": "ts-node  -r dotenv/config src/server.ts",
     "local:init": "cp sample.dev src/.env",
     "local": "NODE_ENV=development nodemon",
+    "lint": "./node_modules/eslint/bin/eslint.js  --ext .ts src",
     "env:list": "grep 'process.env' -Rn *.js"
   },
   "author": "",

@@ -25,13 +25,21 @@ class Db {
       })
   }
 
+  selectById (id, callback) {
+    return this.db.get(
+      'SELECT * FROM user WHERE id = ?',
+      [id], function (err, row) {
+        callback(err, row)
+      })
+  }
+
   selectAll (callback) {
     return this.db.all('SELECT * FROM user', function (err, rows) {
       callback(err, rows)
     })
   }
 
-  insert (email, callback) {
+  insertUser (email, callback) {
     return this.db.run(
       'INSERT INTO user (email) VALUES (?)',
       [email], (err) => {
@@ -39,7 +47,7 @@ class Db {
       })
   }
 
-  update (userId, appData, callback) {
+  updateAppData (userId, appData, callback) {
     return this.db.run(
       'UPDATE user SET appData = ? WHERE id = ?',
       [appData, userId], (err) => {

@@ -30,13 +30,17 @@ function createApp (middleWare: express.RequestHandler[], apiProviders: ApiProvi
   apiProviders.forEach((provider) => {
     provider.addRoute(middleWare, eApp)
   })
-  eApp.get('/', (req, res) => {
-    console.log(`npuser-sample-server: get / call ip: ${req.ip}`)
-    res.status(200).send({ message: BANNER })
-  })
+  // eApp.get('/', middleWare, (req: Request, res: Response) => {
+  //   console.log(`npuser-sample-server: get / call ip: ${req.ip}`)
+  //   res.status(200).send({ message: BANNER })
+  // })
   // add error handling middleware last.
   // See https://thecodebarbarian.com/80-20-guide-to-express-error-handling
   eApp.use(appErrorMiddleWare)
+  eApp.get('*', function (req, res) {
+    console.log('404ing')
+    res.status(404).send('Page not found')
+  })
   return eApp
 }
 
