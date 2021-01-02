@@ -1,25 +1,23 @@
 <template lang="pug">
 div
   h1 Account
-  button(v-on:click="logout()", title="Logout") Logout
+  div Your private user information: {{ userInfo }}
+  div(class="button-group")
+    button(v-on:click="refresh()", title="refresh") Refresh
+    button(v-on:click="userLogout()", title="Logout") Logout
 
 </template>
 
 <script lang="ts">
-import router from '@/router'
 import { useUsers } from '@/user'
 
 export default {
   setup () {
-    const { userLogout } = useUsers()
-
-    const logout = async () => {
-      userLogout()
-      router.push('/')
-    }
+    const { userInfo, userLogout } = useUsers()
 
     return {
-      logout
+      userLogout,
+      userInfo
     }
   }
 }

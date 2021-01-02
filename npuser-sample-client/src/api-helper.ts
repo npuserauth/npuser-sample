@@ -4,7 +4,7 @@ const URL = 'http://localhost:3000/'
 
 export const postToMyServer = async function (apiUrl: string, payload: object) {
   const url = URL + apiUrl
-  console.log(`Auth post to ${url}`)
+  // console.log(`Auth post to ${url}`)
   return npAxios
     .post(url, payload)
     .then(response => { return response.data })

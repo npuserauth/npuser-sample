@@ -1,6 +1,13 @@
 import {getFromMyServer, postToMyServer} from '@/api-helper'
 import {computed, ComputedRef, Ref, ref} from 'vue'
+import router from '@/router'
 
+/*
+User management code for the sample application.  The following shows one of many ways your application
+might manage users.  It is up to you and npUser is not involved.
+
+Yet, see npVerifyUser in the Auth.vue component.
+ */
 const AUTH_TOKEN_KEY = 'authToken'
 
 interface DbUser {
@@ -45,14 +52,22 @@ function getDefs() {
     console.log('User', 'userLogout')
     _authToken.value = ''
     localStorage.removeItem(AUTH_TOKEN_KEY)
-    return loadUser()
+    await loadUser()
+    router.push('/')
+    return Promise.resolve()
   }
 
   async function userLoggedIn(token: string): Promise<void> {
     console.log('User', 'log in user', token)
     _authToken.value = token
+    // Stash the token so the user can refresh their browser.
+    // Stash in localStorage so the user can open a tab on this sample app, or close and open their browser
+    // if needed (e.g. reboot their machine).  This stash is local to the browser.
+    // If the user comes to this application via another browswer they will need to login again the same way.
     localStorage.setItem(AUTH_TOKEN_KEY, token)
-    return loadUser()
+    await loadUser()
+    router.push('/dashboard')
+    return Promise.resolve()
   }
 
   async function userRefresh() {

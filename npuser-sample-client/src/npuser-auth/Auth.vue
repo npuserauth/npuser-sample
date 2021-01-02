@@ -1,32 +1,6 @@
 <template lang="pug">
 div
-  div
-    div(class="")
-      label(for="fakeLoginEmail") fake login email
-      input(type="text", v-model="uState.fakeLoginEmail", id="fakeLoginEmail", name="fakeLoginEmail")
-      button(v-on:click="fakeLoginEmail()", title="Ap") Fake login
-    div(class="")
-      label(for="userText") user text
-      input(type="text", v-model="uState.userText", id="userText", name="userText")
-      button(v-on:click="updateUserText()", title="updateUserText") Update
-    div(class="")
-      label User Text
-      div authenticated {{ authenticated }}
-      div authToken {{ authToken }}
-      div userAppData: {{ userAppData }}
-      div {{ userInfo }}
-      button(v-on:click="refresh()", title="refresh") Refresh
-      button(v-on:click="logout()", title="logout") Logout
-
-  div
-    pre {{ state.data }}
-    div ---
-
-  <!-- now real sample below -->
-  div &nbsp;
-  hr
-  h5 above is experiment and below is real sample
-  div(v-if="state.isPendingUserEmail")
+  div(v-if="isPendingUserEmail")
     login-form-input-email(v-on:email="npAuthUser($event)")
     p(v-if="state.errMsg", class="error-text") {{state.errMsg}}
     p.
@@ -37,7 +11,7 @@ div
       To help keep our system safe and running, this application will store your IP address for up to one day. This is only used to prevent malicious users from over loading the system and denying you access.
     p Please write to us if you have any questions or concerns at <a href="mailto:info@npuser.org">info@npuser.org</a>
     hr
-  div(v-if="state.isPendingVerificationCode")
+  div(v-if="isPendingVerificationCode")
     login-form-input-v-code(v-on:vcode="npVerifyUser($event)", v-on:cancel="npCancelLogin()")
     p(v-if="state.errMsg", class="error-text") {{state.errMsg}}
     p.
@@ -52,25 +26,19 @@ div
 </template>
 
 <script lang="ts">
-import { reactive } from 'vue'
+import { computed, reactive } from 'vue'
+import { onMounted } from 'vue'
 import LoginFormInputEmail from './LoginFormEmail.vue'
 import LoginFormInputVCode from './LoginFormVCode.vue'
 import State from '../state'
-import { postToMyServer, getFromMyServer } from '@/api-helper'
+import { postToMyServer } from '@/api-helper'
 import { useUsers } from '@/user'
 
 type AuthState = {
-  isPendingUserEmail: boolean;
-  isPendingVerificationCode: boolean;
   email: string;
   tokenInput: string;
   errMsg?: string;
   data?: string;
-}
-
-type UState = {
-  fakeLoginEmail?: string;
-  userText? : string;
 }
 
 const SAMPLE_SERVER_AUTH_PATH = 'user/auth'
@@ -81,24 +49,27 @@ export default {
     LoginFormInputEmail, LoginFormInputVCode
   },
   setup () {
+    const { authenticated, userLoggedIn, userLogout} = useUsers()
+
     const state: AuthState = reactive({
-      isPendingUserEmail: true,
-      isPendingVerificationCode: false,
       email: '',
       tokenInput: '',
       errMsg: undefined,
       data: '',
     })
+    onMounted(() => {
+      state.email = ''
+      state.tokenInput = ''
+      state.errMsg = undefined
+      state.data = ''
+    })
 
-    const { authenticated, userLoggedIn, userLogout} = useUsers()
-
-    type LogInBody = { auth: boolean; newUser: boolean; token: string; user: object }
+    const isPendingUserEmail = computed((): boolean => !(authenticated.value || state.tokenInput.length > 0))
+    const isPendingVerificationCode = computed((): boolean => !isPendingUserEmail.value && state.email.length > 0)
 
     const npCancelLogin = async () => {
       state.email = ''
       await userLogout()
-      state.isPendingUserEmail = true
-      state.isPendingVerificationCode = false
       state.errMsg = undefined
     }
 
@@ -106,14 +77,15 @@ export default {
       State.setLoading(true)
       state.errMsg = ''
       try {
+        // important to stash the email to be included in the next post
         state.email = email
         const payload = {
           email: state.email
         }
         const authResponse = await postToMyServer(SAMPLE_SERVER_AUTH_PATH, payload)
         if (authResponse.token) {
-          state.isPendingUserEmail = false
-          state.isPendingVerificationCode = true
+          // important to stash the np user token to be included in the next post
+          state.tokenInput = authResponse.token
         } else {
           state.errMsg = authResponse.message
         }
@@ -124,20 +96,33 @@ export default {
       }
     }
 
+    /**
+     * Step 2. Take the verification code the user provides, and the stashed email address and npUser token and
+     * send a POST to your sample application.  Your sample server will talk with npUSer to finalize the user
+     * authentication process.  Your sample server will then respond with its JWT that this client will need
+     * to access any resources the end user has permission to see.
+     *
+     * This function uses the 'userLoggedIn' function (See users.ts) to manage the user state information.
+     */
     const npVerifyUser = async (vcode: string) => {
       State.setLoading(true)
       state.errMsg = ''
       try {
         if (vcode) {
           const payload = {
+            // send the stashed email and np user token
             email: state.email,
             authToken: state.tokenInput,
+            // send the verification code the user obtained via email
             code: vcode
           }
           const validationResponse = await postToMyServer(SAMPLE_SERVER_VALIDATE_PATH, payload)
           console.log('Validation response:', validationResponse)
           if (validationResponse.token) {
-            state.isPendingVerificationCode = false
+            // The user is now logged into the system.
+            // stash the JWT we've been given. It is our sample application's JWT and is needed
+            // for this client to authenticate with our sample application.
+            // But actually, how your application handles the verification is up to you.
             userLoggedIn(validationResponse.token)
           } else {
             state.errMsg = validationResponse.message
@@ -153,53 +138,14 @@ export default {
     }
 
     /* ---------------------------------------------------- */
-
-    const uState: UState = reactive({
-      fakeLoginEmail: '',
-      userText: '',
-    })
-    const {authToken, userAppData, userInfo, userRefresh, userUpdateData } = useUsers()
-
-    const fakeLoginEmail = async () => {
-      const payload= {email: uState.fakeLoginEmail}
-      const response = await postToMyServer('app/fake', payload)
-      state.data = JSON.stringify(response, null, 2)
-      const data: LogInBody = response
-      const token: string = data.token
-      userLoggedIn(token)
-    }
-
-    const refresh = async () => {
-      await userRefresh()
-    }
-
-    const logout = async () => {
-      await userLogout()
-      console.log('user.logoutUser so auth:', authenticated.value)
-    }
-
-    const updateUserText = async () => {
-      await userUpdateData(uState.userText || '')
-    }
-
-
-    /* ---------------------------------------------------- */
     return {
       state,
       authenticated,
+      isPendingUserEmail,
+      isPendingVerificationCode,
       npAuthUser,
       npCancelLogin,
       npVerifyUser,
-
-      // faking testing
-      uState,
-      authToken,
-      logout,
-      refresh,
-      fakeLoginEmail,
-      updateUserText,
-      userAppData,
-      userInfo,
     }
   }
 }

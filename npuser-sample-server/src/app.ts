@@ -1,8 +1,8 @@
 import express, { Router, Request, Response, NextFunction } from 'express'
 import asyncHandler from 'express-async-handler'
-import jwt from 'jsonwebtoken'
+import jwt, { TokenExpiredError } from 'jsonwebtoken'
 import { ApiProvider } from './server'
-import { InvalidRequest } from './errors/application-error'
+import { InvalidRequest, ExpiredRequest } from './errors/application-error'
 
 const { sendResponse } = require('./response-handlers')
 
@@ -52,10 +52,11 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
       return next()
     } catch (err) {
       // could provide more nuanced error responses...
-      // if (err instanceof TokenExpiredError) {
+      if (err instanceof TokenExpiredError) {
+        return next(new ExpiredRequest())
       // } else if (err instanceof JsonWebTokenError) {
       // } else {
-      // }
+      }
       return next(new InvalidRequest())
     }
   }
